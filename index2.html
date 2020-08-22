@@ -30,6 +30,7 @@
   import { Space } from './Space.js'
   import { min } from './min.js'
   import { max } from './max.js'
+  import { Viewport } from './Viewport.js'
 
   class Pixel {
     constructor(x, y) {
@@ -52,11 +53,13 @@
 
     const pixels = await load()
 
-    const minX = Math.floor(min(pixels.map(pixel => pixel.x)))
-    const maxX = Math.ceil(max(pixels.map(pixel => pixel.x)))
-    const minY = Math.floor(min(pixels.map(pixel => pixel.y)))
-    const maxY = Math.ceil(max(pixels.map(pixel => pixel.y)))
-    const space = new Space({minX, maxX, minY, maxY})
+    let spaceViewport = new Viewport({
+      minX: BigInt(Math.floor(min(pixels.map(pixel => pixel.x)))),
+      maxX: BigInt(Math.ceil(max(pixels.map(pixel => pixel.x)))),
+      minY: BigInt(Math.floor(min(pixels.map(pixel => pixel.y)))),
+      maxY: BigInt(Math.ceil(max(pixels.map(pixel => pixel.y))))
+    })
+    const space = new Space(spaceViewport)
     for (const pixel of pixels) {
       space.set(pixel, true)
     }
@@ -100,13 +103,17 @@
       const width = canvas.width
       const height = canvas.height
       const imageData = context.createImageData(width, height)
-      for (let y = viewport.minY; y <= viewport.maxY; y++) {
-        for (let x = viewport.minX; x <= viewport.maxX; x++) {
+      const maxXi = Number(viewport.maxX - viewport.minX)
+      const maxYi = Number(viewport.maxY - viewport.minY)
+      for (let yi = 0; yi <= maxYi; yi++) {
+        for (let xi = 0; xi <= maxXi; xi++) {
+          const x = viewport.minX + BigInt(xi)
+          const y = viewport.minY + BigInt(yi)
           const pixel = space.get({x, y})
           if (pixel) {
             for (let yDelta = 0; yDelta < devicePixelRatio; yDelta++) {
               for (let xDelta = 0; xDelta < devicePixelRatio; xDelta++) {
-                const index = ((devicePixelRatio * (viewport.maxY - y) + yDelta) * width + (devicePixelRatio * (x - viewport.minX) + xDelta)) * 4
+                const index = ((devicePixelRatio * (maxYi - yi) + yDelta) * width + (devicePixelRatio * xi + xDelta)) * 4
                 imageData.data[index] = 0
                 imageData.data[index + 1] = 0
                 imageData.data[index + 2] = 0
@@ -224,8 +231,8 @@
 
         if (previousPosition) {
           const delta = {
-            x: position.x - previousPosition.x,
-            y: position.y - previousPosition.y
+            x: BigInt(position.x - previousPosition.x),
+            y: BigInt(position.y - previousPosition.y)
           }
           viewport = {
             minX: viewport.minX - delta.x,
@@ -298,31 +305,31 @@
 
     function getViewportCenter() {
       return {
-        x: Math.floor(viewport.minX + 0.5 * (viewport.maxX - viewport.minX)),
-        y: Math.floor(viewport.minY + 0.5 * (viewport.maxY - viewport.minY))
+        x: Math.floor(viewport.minX + BigInt(Math.floor(0.5 * Number(viewport.maxX - viewport.minX)))),
+        y: Math.floor(viewport.minY + BigInt(Math.floor(0.5 * Number(viewport.maxY - viewport.minY))))
       }
     }
 
     function setViewportCenter(x, y) {
       const width = window.innerWidth
       const height = window.innerHeight
-      viewport = {
-        minX: Math.floor(x - 0.5 * width),
-        maxX: Math.floor(x + 0.5 * width),
-        minY: Math.floor(y - 0.5 * height),
-        maxY: Math.floor(y + 0.5 * height)
-      }
+      viewport = new Viewport({
+        minX: BigInt(Math.floor(x - 0.5 * width)),
+        maxX: BigInt(Math.floor(x + 0.5 * width)),
+        minY: BigInt(Math.floor(y - 0.5 * height)),
+        maxY: BigInt(Math.floor(y + 0.5 * height))
+      })
       saveViewport()
       updateView()
     }
 
     function moveViewport(deltaX, deltaY) {
-      viewport = {
-        minX: viewport.minX + Math.floor(deltaX),
-        maxX: viewport.maxX + Math.floor(deltaX),
-        minY: viewport.minY + Math.floor(deltaY),
-        maxY: viewport.maxY + Math.floor(deltaY)
-      }
+      viewport = new Viewport({
+        minX: viewport.minX + BigInt(Math.floor(deltaX)),
+        maxX: viewport.maxX + BigInt(Math.floor(deltaX)),
+        minY: viewport.minY + BigInt(Math.floor(deltaY)),
+        maxY: viewport.maxY + BigInt(Math.floor(deltaY))
+      })
       saveViewport()
       updateView()
     }
@@ -368,18 +375,17 @@
   }
 
   async function loadViewport() {
-    const viewport = JSON.parse(await getValue('viewport') || JSON.stringify(
-      {
+    const viewport = new Viewport(
+      JSON.parse(await getValue('viewport') ||
+      JSON.stringify({
         minX: Math.floor(0 - 0.5 * window.innerWidth),
         maxX: Math.floor(0 + 0.5 * window.innerWidth),
         minY: Math.floor(0 - 0.5 * window.innerHeight),
         maxY: Math.floor(0 + 0.5 * window.innerHeight)
       })
-    )
-    viewport.minX = Math.floor(viewport.minX)
-    viewport.maxY = Math.floor(viewport.maxY)
-    viewport.maxX = viewport.minX + window.innerWidth
-    viewport.minY = viewport.maxY - window.innerHeight
+    ))
+    viewport.maxX = viewport.minX + BigInt(window.innerWidth)
+    viewport.minY = viewport.maxY - BigInt(window.innerHeight)
     return viewport
   }
 
@@ -392,8 +398,8 @@
 
   function pixelCoordinatesToViewportCoordinates(viewport, pixel) {
     if (isPixelVisible(viewport, pixel)) {
-      const x = pixel.x - viewport.minX
-      const y = viewport.maxY - pixel.y
+      const x = Number(pixel.x - viewport.minX)
+      const y = Number(viewport.maxY - pixel.y)
       return {x, y}
     } else {
       throw new Error('Pixel not in viewport')
@@ -402,8 +408,8 @@
 
   function viewportCoordinatesToPixelCoordinates(viewport, {x, y}) {
     return {
-      x: viewport.minX + x,
-      y: viewport.maxY - y
+      x: viewport.minX + BigInt(x),
+      y: viewport.maxY - BigInt(y)
     }
   }
 </script>
