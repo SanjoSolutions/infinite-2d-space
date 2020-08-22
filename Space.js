@@ -4,18 +4,32 @@ import { convertNumbeToBigInt } from './convertNumberToBigInt.js'
 
 export class Space {
   constructor (viewport) {
-    this.viewport = viewport
+    this._viewport = viewport
+    this._width = this._calculateWidth()
+    this._height = this._calculateHeight()
     this.data = new ArrayBuffer(Number(this.width * this.height))
     this.view = new Uint8Array(this.data)
   }
 
+  get viewport() {
+    return this._viewport
+  }
+
   get width () {
+    return this._width
+  }
+
+  get height () {
+    return this._height
+  }
+
+  _calculateWidth() {
     return (
       this.viewport.maxX - this.viewport.minX + 1n
     ) / 8n * 8n
   }
 
-  get height () {
+  _calculateHeight() {
     return (
       this.viewport.maxY - this.viewport.minY + 1n
     ) / 8n * 8n

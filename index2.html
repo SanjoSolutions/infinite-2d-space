@@ -305,8 +305,8 @@
 
     function getViewportCenter() {
       return {
-        x: Math.floor(viewport.minX + BigInt(Math.floor(0.5 * Number(viewport.maxX - viewport.minX)))),
-        y: Math.floor(viewport.minY + BigInt(Math.floor(0.5 * Number(viewport.maxY - viewport.minY))))
+        x: viewport.minX + BigInt(Math.floor(0.5 * Number(viewport.maxX - viewport.minX))),
+        y: viewport.minY + BigInt(Math.floor(0.5 * Number(viewport.maxY - viewport.minY)))
       }
     }
 
