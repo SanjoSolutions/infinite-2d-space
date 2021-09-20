@@ -1,4 +1,4 @@
-import { initializeApp } from '../../firebase/initializeApp.js'
+import { initializeApp } from './unnamed/firebase/initializeApp.js'
 
 const firebaseConfig = {
   apiKey: "AIzaSyBpMvJ0coLk4bhNdm5jNiYUO1ZpXmi_4bY",
@@ -10,6 +10,5 @@ const firebaseConfig = {
 }
 
 export function initializeFirebase() {
-  debugger
   return initializeApp(firebaseConfig)
 }

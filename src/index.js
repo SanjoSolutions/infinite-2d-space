@@ -1,10 +1,10 @@
-import '../../createFullDocumentCanvas/createFullDocumentCanvas.css'
-import { createFullDocumentCanvas } from '../../createFullDocumentCanvas/createFullDocumentCanvas.js'
-import { delayed } from '../../delayed.js'
-import { getValue, setValue } from '../../localStorageDB.js'
-import { max } from '../../max.js'
-import { min } from '../../min.js'
-import { throttle } from '../../throttle.js'
+import './unnamed/createFullDocumentCanvas/createFullDocumentCanvas.css'
+import { createFullDocumentCanvas } from './unnamed/createFullDocumentCanvas/createFullDocumentCanvas.js'
+import { delayed } from './unnamed/delayed.js'
+import { getValue, setValue } from './unnamed/localStorageDB.js'
+import { max } from './unnamed/max.js'
+import { min } from './unnamed/min.js'
+import { throttle } from './unnamed/throttle.js'
 import './index.css'
 import { FirestoreSpace } from './FirestoreSpace.js'
 import { initializeFirebase } from './initializeFirebase.js'
@@ -22,10 +22,10 @@ async function main() {
     messagingSenderId: "532791309142",
     appId: "1:532791309142:web:b70bea12bae00ad71fdcf7"
   })
-  debugger
   const space = new FirestoreSpace()
 
   let viewport = await loadViewportCenter()
+  space.setOnUpdate(updateView)
   space.setViewport(viewport)
 
   let saveViewportCenterHandler
