@@ -1,7 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "build": "webpack --config webpack.prod.js",
     "build:watch": "webpack serve --open --config webpack.dev.js",
     "emulators:start": "firebase emulators:start"

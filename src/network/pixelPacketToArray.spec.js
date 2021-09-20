@@ -1,5 +1,5 @@
 import { describe, it } from "@jest/globals";
-import { createSendPixelsToServerPacket } from "./client.js";
+import { createSendPixelsToServerPacket } from "./client/Client.js";
 import { pixelPacketToArray } from "./pixelPacketToArray.js";
 
 describe("pixelPacketToArray", () => {

@@ -1,5 +1,4 @@
-import { arrayEquals } from "./arrayEquals.js";
-import { littleEndian } from "./littleEndian.js";
+import { arrayEquals } from "../../arrayEquals.js";
 
 export function pixelPacketEquals(a, b) {
   return codeEquals(a, b) && pixelsArrayLengthEquals(a, b) && pixelsEqual(a, b);
@@ -19,7 +18,7 @@ export function pixelsArrayLengthEquals(a, b) {
 export function getPixelsArrayLength(packet) {
   const view = new DataView(packet);
   const pixelsArrayLengthByteOffset = 1;
-  return view.getUint32(pixelsArrayLengthByteOffset, littleEndian);
+  return view.getUint32(pixelsArrayLengthByteOffset);
 }
 
 export function pixelsEqual(a, b) {
