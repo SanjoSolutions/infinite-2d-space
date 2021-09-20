@@ -1,7 +1,7 @@
 import { arrayEquals } from "./arrayEquals.js";
 import { littleEndian } from "./littleEndian.js";
 
-export function pixelPaketEquals(a, b) {
+export function pixelPacketEquals(a, b) {
   return codeEquals(a, b) && pixelsArrayLengthEquals(a, b) && pixelsEqual(a, b);
 }
 
@@ -16,8 +16,8 @@ export function pixelsArrayLengthEquals(a, b) {
   return getPixelsArrayLength(a) === getPixelsArrayLength(b);
 }
 
-export function getPixelsArrayLength(paket) {
-  const view = new DataView(paket);
+export function getPixelsArrayLength(packet) {
+  const view = new DataView(packet);
   const pixelsArrayLengthByteOffset = 1;
   return view.getUint32(pixelsArrayLengthByteOffset, littleEndian);
 }

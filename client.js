@@ -19,11 +19,11 @@
 import { littleEndian } from "./littleEndian.js";
 
 function sendPixelsToServer(pixels) {
-  const data = createSendPixelsToServerPaket(pixels);
+  const data = createSendPixelsToServerPacket(pixels);
   socket.send(data);
 }
 
-export function createSendPixelsToServerPaket(pixels) {
+export function createSendPixelsToServerPacket(pixels) {
   const data = new ArrayBuffer(1 + 4 + pixels.length * 2 * 4);
   const view = new DataView(data);
   view.setUint8(0, 0);
@@ -37,11 +37,11 @@ export function createSendPixelsToServerPaket(pixels) {
 }
 
 function requestPixelsForViewport({ minX, maxX, minY, maxY }) {
-  const data = createRequestPixelsForViewportPaket({ minX, maxX, minY, maxY });
+  const data = createRequestPixelsForViewportPacket({ minX, maxX, minY, maxY });
   socket.send(data);
 }
 
-export function createRequestPixelsForViewportPaket({
+export function createRequestPixelsForViewportPacket({
   minX,
   maxX,
   minY,
