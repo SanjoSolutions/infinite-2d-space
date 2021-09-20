@@ -1,6 +1,7 @@
 import { doc, onSnapshot, setDoc } from 'firebase/firestore'
 import { Space } from './Space2.js'
 import { getDatabase } from './unnamed/firebase/getDatabase.js'
+import { throttle } from './unnamed/throttle.js'
 
 export class FirestoreSpace {
   constructor() {
@@ -17,22 +18,25 @@ export class FirestoreSpace {
     }
     this._unsubscribe = onSnapshot(
       this._getDocumentReference(),
-      snapshot => {
-        this._space = new Space()
-        const data = snapshot.data()
-        const {pixels} = data
-        for (const yKey of Object.keys(pixels)) {
-          const y = Number(yKey)
-          const row = pixels[yKey]
-          for (const xKey of Object.keys(row)) {
-            const x = Number(xKey)
-            this._space.set({x, y})
+      throttle(
+        snapshot => {
+          this._space = new Space()
+          const data = snapshot.data()
+          const {pixels} = data
+          for (const yKey of Object.keys(pixels)) {
+            const y = Number(yKey)
+            const row = pixels[yKey]
+            for (const xKey of Object.keys(row)) {
+              const x = Number(xKey)
+              this._space.set({x, y})
+            }
           }
-        }
-        if (this._onUpdate) {
-          this._onUpdate()
-        }
-      },
+          if (this._onUpdate) {
+            this._onUpdate()
+          }
+        },
+        1000 / 60
+      )
     )
   }
 
