@@ -4,7 +4,7 @@
 // 1: Requesting pixels for viewport (also tells the server the active viewport, for sending pixels drawn by other users.)
 // Receiving pixels from server
 // 1: Receiving pixels for viewport (ArrayBuffer for requested {minX, maxX, minY, maxY})
-// 2: Receiving pixels drawn by other user (tuple of (x, y) tuples)
+// 2: Receiving pixels drawn by other users (tuple of (x, y) tuples)
 
 // x, y ∈ ℤ
 // 32bit Number for x and y
